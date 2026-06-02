@@ -1,0 +1,72 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-12 px-6">
+    <div class="max-w-3xl mx-auto flex flex-col md:flex-row gap-8">
+        
+        <!-- Left Side: Payment Details -->
+        <div class="flex-grow bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <h2 class="text-2xl font-black text-gray-900 mb-6">Complete your booking</h2>
+            
+            <div class="mb-8 p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-4">
+                <div class="text-blue-600 mt-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <h4 class="font-bold text-blue-900">Secure Payment</h4>
+                    <p class="text-sm text-blue-700 mt-1">This is a simulated checkout. No real card is required.</p>
+                </div>
+            </div>
+
+            <!-- Simulated Credit Card Form -->
+            <div class="space-y-4 mb-8 opacity-70 cursor-not-allowed">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Card Number</label>
+                    <input type="text" disabled value="•••• •••• •••• 4242" class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Expiry Date</label>
+                        <input type="text" disabled value="12/28" class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">CVC</label>
+                        <input type="text" disabled value="•••" class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Actual Submit Button -->
+            <form method="POST" action="">
+                {% csrf_token %}
+                <button type="submit" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-xl transition-colors shadow-lg text-lg flex justify-center items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.95 11.95 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    Pay ₹{{ fee }} & Confirm Booking
+                </button>
+            </form>
+            
+            <p class="text-center text-xs text-gray-400 mt-4">By confirming, you agree to our Terms of Service.</p>
+        </div>
+
+        <!-- Right Side: Order Summary -->
+        <div class="w-full md:w-80 h-fit bg-slate-900 rounded-2xl shadow-sm border border-slate-800 p-6 text-white">
+            <h3 class="text-lg font-bold mb-4 border-b border-slate-700 pb-4">Order Summary</h3>
+            
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-slate-400 text-sm">Professional</span>
+                <span class="font-medium capitalize">{{ pro.user.username }}</span>
+            </div>
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-slate-400 text-sm">Trade</span>
+                <span class="font-medium">{{ pro.get_profession_display }}</span>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-slate-700 flex justify-between items-center">
+                <span class="text-slate-400 font-medium">Platform Fee</span>
+                <span class="text-2xl font-black">₹{{ fee }}</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+<script src="https://cdn.tailwindcss.com"></script>
+<body class="bg-gray-50 min-h-screen">
+    
+    <!-- Header with Back Button -->
+    <header class="bg-white border-b border-gray-200 py-10 px-6">
+        <div class="max-w-6xl mx-auto">
+            <a href="{% url 'home' %}" class="text-sm font-bold text-blue-600 hover:underline mb-4 inline-block">← All Categories</a>
+            <h1 class="text-4xl font-black text-gray-900 capitalize">{{ profession_name }}s</h1>
+            <p class="text-gray-500 mt-2">Found {{ professionals.count }} experts available now.</p>
+        </div>
+    </header>
+
+    <!-- Professional Grid -->
+    <main class="max-w-6xl mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for pro in professionals %}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-2xl">
+                        {{ pro.user.username|make_list|first|upper }}
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 capitalize">{{ pro.user.username }}</h3>
+                        <p class="text-sm text-yellow-500 font-bold">⭐ {{ pro.average_rating }}</p>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-6 h-12 overflow-hidden text-sm">{{ pro.bio }}</p>
+                <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                    <span class="text-lg font-black text-gray-900">₹{{ pro.hourly_rate }}<span class="text-xs text-gray-400">/hr</span></span>
+                    <a href="{% url 'book_professional' pro.id %}" class="bg-blue-600 text-white text-sm font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition">Book</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-20">
+                <p class="text-gray-400 text-xl font-medium">No {{ profession_name }}s found in your area yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</body>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ pro.user.username }} | LocalLink</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 50px; text-align: center; }
+        .profile-card { background: white; padding: 40px; border-radius: 10px; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .badge { background: #f59e0b; color: #111827; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 14px;}
+        .back-btn { display: inline-block; margin-top: 20px; text-decoration: none; color: #111827; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="profile-card">
+        <h1>{{ pro.user.username }}</h1>
+        
+        {% if pro.is_verified %}
+            <span class="badge">Verified Professional ✓</span>
+        {% endif %}
+        
+        <h3 style="color: #666;">Rating: {{ pro.average_rating }} / 5.0</h3>
+        
+        <hr style="margin: 20px 0; border: 1px solid #eee;">
+        
+        <h3>About Me</h3>
+        <p style="font-size: 18px; line-height: 1.6;">
+            {% if pro.bio %}
+                {{ pro.bio }}
+            {% else %}
+                This professional hasn't written a bio yet.
+            {% endif %}
+        </p>
+
+        <a href="{% url 'book_professional' pro.id %}" style="display: inline-block; padding: 15px 30px; background: #111827; color: white; text-decoration: none; font-size: 16px; border-radius: 5px; margin-top: 20px;">Book this Professional</a>
+        
+        <br>
+        <a href="{% url 'home' %}" class="back-btn">← Back to Homepage</a>
+    </div>
+
+</body>
+</html>
