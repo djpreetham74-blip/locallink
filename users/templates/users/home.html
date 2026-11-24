@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LocalLink | Find Professionals</title>
+    <title>LocalLink | Find Professionals & Local Jobs</title>
     
-    <!-- This is required for the AI Chat to work -->
+    <!-- Required for AI Chat & API calls -->
     <meta name="csrf-token" content="{{ csrf_token }}">
     
-    <!-- This is the magic Tailwind CSS link! -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased pb-24">
@@ -19,12 +19,10 @@
         
         <div class="flex gap-6 items-center">
             {% if user.is_authenticated %}
-                <!-- What logged-in users see -->
                 <span class="text-sm text-gray-500 font-medium hidden md:inline">Hello, <span class="text-gray-900 font-bold capitalize">{{ user.username }}</span>!</span>
                 <a href="{% url 'user_dashboard' %}" class="text-sm font-bold text-blue-600 hover:text-blue-800 transition">My Dashboard</a>
                 <a href="{% url 'logout' %}" class="text-sm font-bold text-red-500 hover:text-red-700 transition">Log out</a>
             {% else %}
-                <!-- What guests see -->
                 <a href="{% url 'login' %}" class="text-sm font-bold text-gray-600 hover:text-blue-600 transition">Log in</a>
                 <a href="{% url 'signup' %}" class="text-sm font-bold bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-sm">Sign Up</a>
             {% endif %}
@@ -34,7 +32,7 @@
     <!-- Hero Header section -->
     <header class="max-w-4xl mx-auto mt-16 mb-12 px-6 text-center">
         <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Find the perfect professional today.</h2>
-        <p class="text-xl text-gray-500">Trusted plumbers, electricians, and more, ready to help at a moment's notice.</p>
+        <p class="text-xl text-gray-500">Trusted plumbers, electricians, and hyper-local daily wage openings ready at a moment's notice.</p>
     </header>
 
     <!-- Professional Cards Grid -->
@@ -42,12 +40,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             
             {% for pro in professionals %}
-            <!-- Individual Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:-translate-y-1 transition duration-200">
                 
                 <!-- Avatar & Name -->
                 <div class="flex items-center gap-4 mb-4">
-                    <!-- This generates a circle with the first letter of their name -->
                     <div class="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-2xl">
                         {{ pro.user.username|make_list|first|upper }}
                     </div>
@@ -71,7 +67,6 @@
             </div>
             
             {% empty %}
-            <!-- What shows if the database is empty -->
             <div class="col-span-full text-center py-12">
                 <p class="text-gray-500 text-lg">No professionals found in the database.</p>
             </div>
@@ -80,9 +75,51 @@
         </div>
     </main>
 
-    <!-- !!! LEAVE YOUR AI CHAT WIDGET HTML AND SCRIPT EXACTLY WHERE IT IS DOWN HERE !!! -->
+    <!-- HYPER-LOCAL JOB BOARD SECTION (Problem Statement 3 + ElevenLabs + WhatsApp) -->
+    <section class="max-w-6xl mx-auto px-6 mt-16">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Nearby Daily-Wage & Local Openings</h2>
+                <p class="text-gray-500 mt-1">Instant WhatsApp apply & ElevenLabs voice read-out for local workers.</p>
+            </div>
+        </div>
 
-    <!-- AI CHAT WIDGET HTML (Tailwind Version) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for job in jobs %}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between hover:shadow-lg transition duration-200">
+                <div>
+                    <div class="flex justify-between items-start gap-2">
+                        <h3 class="text-xl font-bold text-gray-900">{{ job.title }}</h3>
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
+                            {{ job.get_job_type_display }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">{{ job.employer_name }} • {{ job.location_area }}</p>
+                    <p class="text-xl font-black text-green-700 mt-4">{{ job.wage }}</p>
+                </div>
+
+                <!-- WhatsApp Apply + ElevenLabs Listen Buttons -->
+                <div class="flex gap-2 mt-6 pt-4 border-t border-gray-100">
+                    <a href="https://wa.me/91{{ job.phone_number }}?text=Namaste,%20I%20saw%20your%20{{ job.title|urlencode }}%20opening%20on%20LocalLink."
+                       target="_blank"
+                       class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-bold transition shadow-sm">
+                       Apply on WhatsApp
+                    </a>
+                    <button onclick="playJobAudio({{ job.id }})"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-bold transition shadow-sm">
+                       🔊 Listen
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-10 bg-white rounded-2xl border border-gray-100">
+                <p class="text-gray-500">No local job openings posted yet. Add some in Django Admin!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- AI CHAT WIDGET HTML -->
     <div id="chat-widget" class="fixed bottom-6 right-6 w-[350px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 font-sans border border-gray-100 transition-all duration-300">
         
         <!-- Chat Header -->
@@ -96,7 +133,6 @@
 
         <!-- Chat History -->
         <div id="chat-box" class="h-80 p-4 overflow-y-auto bg-gray-50 flex flex-col gap-3 text-sm">
-            <!-- Initial AI Greeting -->
             <div class="bg-white border border-gray-100 text-gray-800 self-start rounded-2xl rounded-tl-sm py-2.5 px-4 max-w-[85%] shadow-sm leading-relaxed">
                 Hi! I can help you find a professional. What do you need help with today?
             </div>
@@ -111,7 +147,7 @@
         </div>
     </div>
 
-    <!-- AI CHAT WIDGET JAVASCRIPT -->
+    <!-- JAVASCRIPT: AI CHAT + ELEVENLABS AUDIO -->
     <script>
         const chatBox = document.getElementById('chat-box');
         const chatInput = document.getElementById('chat-input');
@@ -137,7 +173,6 @@
         function appendMessage(message, sender) {
             const msgDiv = document.createElement('div');
             
-            // Apply Tailwind classes dynamically based on who is sending the message
             if (sender === 'user') {
                 msgDiv.className = 'bg-blue-600 text-white self-end rounded-2xl rounded-tr-sm py-2.5 px-4 max-w-[85%] shadow-sm leading-relaxed';
             } else {
@@ -146,18 +181,16 @@
             
             msgDiv.innerHTML = message;
             chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         async function sendMessage() {
             const text = chatInput.value.trim();
             if (!text) return;
 
-            // 1. Show user message
             appendMessage(text, 'user');
             chatInput.value = '';
 
-            // 2. Show loading message
             const loadingId = 'loading-' + Date.now();
             const loadingDiv = document.createElement('div');
             loadingDiv.id = loadingId;
@@ -166,7 +199,6 @@
             chatBox.appendChild(loadingDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            // 3. Send to Django Backend
             try {
                 const response = await fetch('/api/chat/', {
                     method: 'POST',
@@ -178,8 +210,6 @@
                 });
 
                 const data = await response.json();
-                
-                // 4. Remove loading message and show AI reply
                 document.getElementById(loadingId).remove();
                 
                 if (data.reply) {
@@ -195,4 +225,16 @@
                 console.error(error);
             }
         }
+
+        // ElevenLabs TTS Audio Player
+        function playJobAudio(jobId) {
+            const audio = new Audio(`/api/job-audio/${jobId}/`);
+            audio.play().catch(err => {
+                console.error("Audio playback failed:", err);
+                alert("Could not play audio. Check your ElevenLabs API key in .env.");
+            });
+        }
     </script>
+</body>
+</html>
+

@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import ProfessionalProfile, Booking
-
+from .models import JobOpening
+admin.site.register(JobOpening)
 User = get_user_model()
 
 # 1. Create the "Inline" box for the Professional Profile

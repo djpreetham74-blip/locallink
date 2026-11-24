@@ -33,4 +33,7 @@ urlpatterns = [
     path('api/polish/', views.ai_magic_polish, name='ai_polish'),
     # Add this to your AI API Endpoints section
     path('api/analyze-image/', views.api_analyze_image, name='api_analyze_image'),
+
+    path('api/job-audio/<int:job_id>/', views.job_audio_tts, name='job_audio_tts'),
+    path('api/voice-search/', views.voice_job_search, name='voice_job_search'),
 ]

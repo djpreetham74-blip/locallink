@@ -20,13 +20,13 @@
     <header class="max-w-7xl mx-auto pt-24 pb-16 px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-12">
         <div class="md:w-1/2">
             <div class="inline-block bg-[#E8A838]/20 text-[#1A3C5E] font-bold px-4 py-1.5 rounded-full text-sm mb-6 tracking-wide uppercase">
-                Premium Local Services
+                Hyper-Local Jobs &amp; Services
             </div>
             <h1 class="text-5xl lg:text-6xl font-serif font-extrabold text-[#1A3C5E] leading-tight mb-6 tracking-tight">
-                Expert help for your home, <br><span class="text-[#E8A838] italic">instantly booked.</span>
+                Expert help &amp; local jobs, <br><span class="text-[#E8A838] italic">instantly matched.</span>
             </h1>
             <p class="text-xl text-gray-600 mb-8 max-w-lg leading-relaxed">
-                Connect with trusted, background-checked professionals near you. Describe your issue or simply snap a photo.
+                Connect with trusted, background-checked professionals or apply to nearby daily-wage openings with voice read-outs and WhatsApp.
             </p>
             
             <div class="relative inline-block w-full sm:w-auto">
@@ -46,19 +46,20 @@
                 <h3 class="font-serif text-2xl font-bold text-[#1A3C5E] mb-6 mt-4">Why LocalLink?</h3>
                 <ul class="space-y-4">
                     <li class="flex items-center gap-3 text-gray-700 font-medium">
-                        <span class="bg-[#E8A838]/20 text-[#E8A838] p-2 rounded-full">✓</span> Verified Professionals
+                        <span class="bg-[#E8A838]/20 text-[#E8A838] p-2 rounded-full">✓</span> Verified Professionals &amp; Employers
                     </li>
                     <li class="flex items-center gap-3 text-gray-700 font-medium">
-                        <span class="bg-[#E8A838]/20 text-[#E8A838] p-2 rounded-full">✓</span> Instant AI Booking
+                        <span class="bg-[#E8A838]/20 text-[#E8A838] p-2 rounded-full">✓</span> ElevenLabs Voice Read-Out
                     </li>
                     <li class="flex items-center gap-3 text-gray-700 font-medium">
-                        <span class="bg-[#E8A838]/20 text-[#E8A838] p-2 rounded-full">✓</span> Secure Payments
+                        <span class="bg-[#E8A838]/20 text-[#E8A838] p-2 rounded-full">✓</span> 1-Tap WhatsApp Apply
                     </li>
                 </ul>
             </div>
         </div>
     </header>
 
+    <!-- SERVICES CATEGORY GRID -->
     <main class="max-w-7xl mx-auto px-6 lg:px-8 mt-8">
         <div class="flex items-end justify-between mb-10 border-b border-gray-200 pb-4">
             <h2 class="text-3xl font-serif font-bold text-[#1C1C1E]">Our Services</h2>
@@ -77,6 +78,50 @@
             {% endfor %}
         </div>
     </main>
+
+    <!-- HYPER-LOCAL JOB BOARD SECTION (Problem Statement 3 + ElevenLabs + WhatsApp) -->
+    <section class="max-w-7xl mx-auto px-6 lg:px-8 mt-20">
+        <div class="flex items-end justify-between mb-10 border-b border-gray-200 pb-4">
+            <div>
+                <h2 class="text-3xl font-serif font-bold text-[#1A3C5E]">Nearby Daily-Wage &amp; Local Openings</h2>
+                <p class="text-gray-500 font-medium mt-1">Tap Listen for voice read-out or apply directly on WhatsApp</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for job in jobs %}
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300">
+                <div>
+                    <div class="flex justify-between items-start gap-3">
+                        <h3 class="text-xl font-bold text-[#1A3C5E]">{{ job.title }}</h3>
+                        <span class="bg-[#E8A838]/20 text-[#1A3C5E] text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                            {{ job.get_job_type_display }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-500 font-medium mt-2">{{ job.employer_name }} &bull; {{ job.location_area }}</p>
+                    <p class="text-2xl font-serif font-extrabold text-[#059669] mt-4">{{ job.wage }}</p>
+                </div>
+
+                <div class="flex gap-2 mt-6 pt-4 border-t border-gray-100">
+                    <a href="https://wa.me/91{{ job.phone_number }}?text=Namaste,%20I%20saw%20your%20{{ job.title|urlencode }}%20opening%20on%20LocalLink."
+                       target="_blank"
+                       class="flex-1 text-center bg-[#059669] hover:bg-[#047857] text-white px-4 py-2.5 rounded-xl text-sm font-bold transition shadow-sm">
+                       Apply on WhatsApp
+                    </a>
+                    <button type="button" onclick="playJobAudio({{ job.id }})"
+                            class="bg-[#1A3C5E] hover:bg-[#0D2A45] text-white px-4 py-2.5 rounded-xl text-sm font-bold transition shadow-sm">
+                       🔊 Listen
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12 bg-white rounded-3xl border border-gray-100">
+                <p class="text-gray-500 font-medium">No local job openings posted yet. Add some in Django Admin!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
 </div>
 
 <script>
@@ -129,6 +174,15 @@
                 }
             });
         }
+    }
+
+    // ElevenLabs TTS Audio Player (must be global for onclick)
+    function playJobAudio(jobId) {
+        const audio = new Audio(`/api/job-audio/${jobId}/`);
+        audio.play().catch(err => {
+            console.error("Audio playback failed:", err);
+            alert("Could not play audio. Make sure ELEVENLABS_API_KEY is set in your .env file.");
+        });
     }
 </script>
 {% endblock %}

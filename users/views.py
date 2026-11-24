@@ -1,14 +1,17 @@
 import json
+import os
+from io import BytesIO
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.core.mail import send_mail
+from elevenlabs.client import ElevenLabs
 
-# Local imports - ALL MODELS AND AI UTILS IMPORTED HERE!
+# Local imports
 from .forms import CustomUserCreationForm
-from .models import ProfessionalProfile, Booking, Review
+from .models import ProfessionalProfile, Booking, Review, JobOpening
 from .ai_utils import ask_ai_agent, analyze_job_image
 
 
@@ -17,9 +20,12 @@ from .ai_utils import ask_ai_agent, analyze_job_image
 # ==========================================
 
 def home(request):
-    # Grab the list of available professions from our model for the category grid
     professions = ProfessionalProfile.PROFESSION_CHOICES
-    return render(request, 'users/category_list.html', {'professions': professions})
+    jobs = JobOpening.objects.all().order_by('-created_at')
+    return render(request, 'users/category_list.html', {
+        'professions': professions,
+        'jobs': jobs,
+    })
 
 def profession_detail(request, profession_slug):
     # Filter the professionals based on the slug from the URL
@@ -321,3 +327,42 @@ def api_analyze_image(request):
             return JsonResponse({'error': 'AI could not process the image.'}, status=500)
             
     return JsonResponse({'error': 'Invalid request or missing image.'}, status=400)
+
+# ==========================================
+# ELEVENLABS VOICE API (TTS + STT)
+# ==========================================
+
+def job_audio_tts(request, job_id):
+    job = get_object_or_404(JobOpening, id=job_id)
+    api_key = os.environ.get("ELEVENLABS_API_KEY")
+    if not api_key:
+        return JsonResponse({"error": "ELEVENLABS_API_KEY missing"}, status=500)
+
+    eleven_client = ElevenLabs(api_key=api_key)
+    script = (
+        f"Job opening for {job.title} at {job.employer_name} in {job.location_area}. "
+        f"Pay is {job.wage}. Tap the green button to apply on WhatsApp."
+    )
+    audio_stream = eleven_client.text_to_speech.convert(
+        text=script,
+        voice_id="JBFqnCBsd6RMkjVDRZzb",
+        model_id="eleven_v4_turbo",
+        output_format="mp3_44100_128",
+    )
+    return HttpResponse(b"".join(audio_stream), content_type="audio/mpeg")
+
+
+def voice_job_search(request):
+    if request.method == "POST" and request.FILES.get("audio"):
+        api_key = os.environ.get("ELEVENLABS_API_KEY")
+        if not api_key:
+            return JsonResponse({"error": "ELEVENLABS_API_KEY missing"}, status=500)
+
+        eleven_client = ElevenLabs(api_key=api_key)
+        transcription = eleven_client.speech_to_text.convert(
+            file=BytesIO(request.FILES["audio"].read()),
+            model_id="scribe_v3",
+            language_code=None,
+        )
+        return JsonResponse({"transcript": transcription.text})
+    return JsonResponse({"error": "No audio uploaded"}, status=400)

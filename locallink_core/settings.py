@@ -33,7 +33,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # This tells Django it is allowed to run on Render's servers
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
+ALLOWED_HOSTS = ['10.24.191.104', '127.0.0.1', 'localhost']
 
 # Application definition
 
@@ -133,6 +133,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # This compresses your files so your website loads lightning fast
 STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": os.environ.get("AWS_STORAGE_BUCKET_NAME"),
+            "region_name": os.environ.get("AWS_S3_REGION_NAME", "ap-south-1"),
+            "file_overwrite": False,
+        },
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
@@ -142,3 +150,19 @@ AUTH_USER_MODEL = 'users.User'
 
 # Prints emails to the terminal for testing purposes
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# settings.py
+if os.environ.get("AWS_STORAGE_BUCKET_NAME"):
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS": {
+                "bucket_name": os.environ.get("AWS_STORAGE_BUCKET_NAME"),
+                "region_name": os.environ.get("AWS_S3_REGION_NAME", "ap-south-1"),
+                "file_overwrite": False,
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }

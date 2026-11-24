@@ -93,3 +93,21 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.rating} Stars for {self.booking.professional.user.username}"
+    
+class JobOpening(models.Model):
+    JOB_TYPE_CHOICES = [
+        ("daily", "Short-Term / Daily Wage"),
+        ("permanent", "Permanent"),
+    ]
+    title = models.CharField(max_length=120)
+    employer_name = models.CharField(max_length=120)
+    phone_number = models.CharField(max_length=15)
+    category = models.CharField(max_length=60)
+    job_type = models.CharField(max_length=20, choices=JOB_TYPE_CHOICES, default="daily")
+    wage = models.CharField(max_length=60)  # e.g., "₹650/day"
+    location_area = models.CharField(max_length=120)  # e.g., "BM Road, Hassan"
+    is_urgent = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.location_area}"
